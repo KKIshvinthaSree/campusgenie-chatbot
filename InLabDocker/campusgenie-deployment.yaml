@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campusgenie-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: campusgenie
+  template:
+    metadata:
+      labels:
+        app: campusgenie
+    spec:
+      containers:
+      - name: campusgenie
+        image: ishvinthasree13/campusgenie:v1
+        ports:
+        - containerPort: 5000

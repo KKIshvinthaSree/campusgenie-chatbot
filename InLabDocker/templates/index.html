@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CampusGenie Chat</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e1bee7);
+      margin: 0;
+      padding: 0;
+    }
+    #chat-container {
+      max-width: 600px;
+      margin: 50px auto;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    #chat-header {
+      background: #6a1b9a;
+      color: white;
+      padding: 15px;
+      font-size: 20px;
+      text-align: center;
+    }
+    #chat-body {
+      padding: 15px;
+      height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .message {
+      margin: 10px 0;
+      display: flex;
+      align-items: flex-start;
+    }
+    .user .bubble {
+      background: #c5cae9;
+      align-self: flex-end;
+    }
+    .bot .bubble {
+      background: #f3e5f5;
+      align-self: flex-start;
+    }
+    .bubble {
+      padding: 10px 15px;
+      border-radius: 20px;
+      max-width: 70%;
+      word-wrap: break-word;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    #chat-input {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+    #input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      font-size: 16px;
+    }
+    #send-btn {
+      background: #6a1b9a;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <div id="chat-header">🧞 CampusGenie</div>
+    <div id="chat-body"></div>
+    <div id="chat-input">
+      <input type="text" id="input" placeholder="Ask me about admission, clubs, hostel..." />
+      <button id="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const chatBody = document.getElementById("chat-body");
+
+    function addMessage(text, sender) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}`;
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = sender === "user" ? "https://i.imgur.com/8QfJYtU.png" : "https://i.imgur.com/1X1Z1Z1.png";
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+      messageDiv.appendChild(avatar);
+      messageDiv.appendChild(bubble);
+      chatBody.appendChild(messageDiv);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById("input");
+      const userText = input.value.trim();
+      if (!userText) return;
+      addMessage(userText, "user");
+      input.value = "";
+
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userText })
+      });
+      const data = await res.json();
+      addMessage(data.response, "bot");
+    }
+  </script>
+</body>
+</html>
